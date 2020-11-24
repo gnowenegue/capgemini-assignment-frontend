@@ -26,6 +26,14 @@ import {
 import DeleteApplianceDialog from 'components/DeleteApplianceDialog';
 import ApplianceDialog from 'components/ApplianceDialog';
 
+const requiredFields = [
+  'serialNumber',
+  'brand',
+  'model',
+  'status',
+  'dateBought',
+];
+
 const AppliancesDataTable = props => {
   const {
     appliances,
@@ -38,6 +46,7 @@ const AppliancesDataTable = props => {
   } = props;
 
   const [dialogFormData, setDialogFormData] = useState({});
+  const [dialogFormErrors, setDialogFormErrors] = useState({});
   const [edit, setEdit] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -54,12 +63,17 @@ const AppliancesDataTable = props => {
     if (e) e.preventDefault();
 
     setEdit(prevEdit => {
-      if (prevEdit) setDialogFormData({});
+      if (prevEdit) {
+        setDialogFormData({});
+        setDialogFormErrors({});
+      }
       return Boolean(id);
     });
 
     if (id) {
-      const applianceToMark = appliances.find(appliance => appliance._id === id);
+      const applianceToMark = appliances.find(
+        appliance => appliance._id === id
+      );
       const markedAppliance = {
         ...applianceToMark,
       };
@@ -67,10 +81,13 @@ const AppliancesDataTable = props => {
       setApplianceMarker(applianceToMark);
 
       delete markedAppliance._id;
+      delete markedAppliance.__v;
+      delete markedAppliance.createdAt;
+      delete markedAppliance.updatedAt;
       const dateToFormat = new Date(markedAppliance.dateBought);
       markedAppliance.dateBought = `${dateToFormat.getFullYear()}-${
         dateToFormat.getMonth() + 1
-      }-${dateToFormat.getDate()}`;
+      }-${dateToFormat.getDate().toString().padStart(2, '0')}`;
 
       setDialogFormData(markedAppliance);
     }
@@ -78,7 +95,6 @@ const AppliancesDataTable = props => {
   };
 
   const hideDialog = () => {
-    console.log('##### dialogFormData', dialogFormData);
     setDialogOpen(false);
   };
 
@@ -104,14 +120,42 @@ const AppliancesDataTable = props => {
 
     appliance.dateBought = Date.parse(appliance.dateBought);
 
+    let res;
+
     if (edit) {
-      await editApplianceAPI(applianceMarker._id, appliance);
+      res = await editApplianceAPI(applianceMarker._id, appliance);
     } else {
-      await addApplianceAPI(appliance);
+      res = await addApplianceAPI(appliance);
     }
-    hideDialog();
-    setDialogFormData({});
-    getData();
+
+    if (res.status === 200) {
+      hideDialog();
+      setDialogFormData({});
+      setDialogFormErrors({});
+      getData();
+    }
+  };
+
+  const validateDialogForm = () => {
+    setDialogFormErrors({});
+
+    const isValid =
+      JSON.stringify(requiredFields.sort()) ===
+        JSON.stringify(Object.keys(dialogFormData).sort()) &&
+      Object.entries(dialogFormData).reduce((acc, cur) => {
+        if (cur[1].trim() === '') {
+          setDialogFormErrors(prevErrors => ({
+            ...prevErrors,
+            [cur[0]]: true,
+          }));
+
+          return false;
+        }
+
+        return acc;
+      }, true);
+
+    if (isValid) addEditAppliance();
   };
 
   return (
@@ -127,8 +171,9 @@ const AppliancesDataTable = props => {
         hideDialog={hideDialog}
         formData={dialogFormData}
         onChangeFormData={onChangeDialogFormData}
-        addEditAppliance={addEditAppliance}
         edit={edit}
+        validateForm={validateDialogForm}
+        errors={dialogFormErrors}
       />
 
       <Toolbar>
