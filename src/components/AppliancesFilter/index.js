@@ -3,6 +3,8 @@ import React from 'react';
 import { Box, Paper, Grid, TextField, Button } from '@material-ui/core';
 import { Search as SearchIcon, Clear as ClearIcon } from '@material-ui/icons';
 
+import PropTypes from 'prop-types';
+
 const AppliancesFilter = props => {
   const { formData, onChangeFormData, resetForm, submitForm } = props;
 
@@ -99,6 +101,13 @@ const AppliancesFilter = props => {
       </form>
     </Paper>
   );
+};
+
+AppliancesFilter.propTypes = {
+  formData: PropTypes.object,
+  onChangeFormData: PropTypes.func,
+  resetForm: PropTypes.func,
+  submitForm: PropTypes.func,
 };
 
 export default AppliancesFilter;

@@ -12,6 +12,8 @@ import {
   ListItemText,
 } from '@material-ui/core';
 
+import PropTypes from 'prop-types';
+
 const DeleteApplianceDialog = props => {
   const { open, hideDialog, appliance, deleteAppliance } = props;
 
@@ -49,6 +51,13 @@ const DeleteApplianceDialog = props => {
       </DialogActions>
     </Dialog>
   );
+};
+
+DeleteApplianceDialog.propTypes = {
+  open: PropTypes.bool,
+  hideDialog: PropTypes.func,
+  appliance: PropTypes.object,
+  deleteAppliance: PropTypes.func,
 };
 
 export default DeleteApplianceDialog;

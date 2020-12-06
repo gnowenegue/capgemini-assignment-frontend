@@ -9,6 +9,8 @@ import {
   TextField,
 } from '@material-ui/core';
 
+import PropTypes from 'prop-types';
+
 const ApplianceDialog = props => {
   const {
     open,
@@ -109,6 +111,16 @@ const ApplianceDialog = props => {
       </DialogActions>
     </Dialog>
   );
+};
+
+ApplianceDialog.propTypes = {
+  open: PropTypes.bool,
+  hideDialog: PropTypes.func,
+  formData: PropTypes.object,
+  onChangeFormData: PropTypes.func,
+  edit: PropTypes.bool,
+  validateForm: PropTypes.func,
+  errors: PropTypes.object,
 };
 
 export default ApplianceDialog;

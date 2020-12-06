@@ -17,6 +17,8 @@ import {
   Button,
 } from '@material-ui/core';
 
+import PropTypes from 'prop-types';
+
 import {
   deleteAppliance as deleteApplianceAPI,
   addAppliance as addApplianceAPI,
@@ -239,6 +241,16 @@ const AppliancesDataTable = props => {
       </TableContainer>
     </Paper>
   );
+};
+
+AppliancesDataTable.propTypes = {
+  appliances: PropTypes.array,
+  page: PropTypes.number,
+  rowsPerPage: PropTypes.number,
+  totalRows: PropTypes.number,
+  handleChangePage: PropTypes.func,
+  handleChangeRowsPerPage: PropTypes.func,
+  getData: PropTypes.func,
 };
 
 export default AppliancesDataTable;
