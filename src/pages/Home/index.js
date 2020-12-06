@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 import { Box } from '@material-ui/core';
 
@@ -11,29 +11,29 @@ const Home = () => {
   const [appliances, setAppliances] = useState([]);
 
   const [filterFormData, setFilterFormData] = useState({});
+  const [filters, setFilters] = useState({});
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalRows, setTotalRows] = useState(0);
 
-  const getData = async () => {
-    const filters = { ...filterFormData };
+  const getData = useCallback(async () => {
+    const _filters = { ...filters };
 
-    if (filterFormData.dateBought) {
-      filters.dateBought = Date.parse(filters.dateBought);
+    if (filters.dateBought) {
+      _filters.dateBought = Date.parse(_filters.dateBought);
     }
 
-    const appliances = await getAppliances(page + 1, rowsPerPage, filters);
+    const appliances = await getAppliances(page + 1, rowsPerPage, _filters);
 
     setAppliances(appliances.data);
     setTotalRows(+appliances.headers['x-total-count']);
-  };
+  }, [filters, page, rowsPerPage]);
 
   useEffect(() => {
     getData();
 
-    //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, rowsPerPage]);
+  }, [getData]);
 
   const onChangeFilterFormData = e => {
     setFilterFormData(prevFormData => ({
@@ -48,6 +48,7 @@ const Home = () => {
 
   const submitFilterForm = e => {
     e.preventDefault();
+    setFilters(filterFormData);
     getData();
   };
 
